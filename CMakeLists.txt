@@ -1,4 +1,8 @@
 cmake_minimum_required(VERSION 3.20)
+
+# פתרון תאימות לספריות ישנות מול CMake 4.x
+set(CMAKE_POLICY_VERSION_MINIMUM 3.5 CACHE STRING "" FORCE)
+
 project(ChordStudio VERSION 0.1.0 LANGUAGES CXX C)
 
 set(CMAKE_CXX_STANDARD 20)
