@@ -6,7 +6,6 @@ on:
   pull_request:
     branches: [ "main", "master" ]
 
-# ביטול ריצות קודמות שעדיין פועלות על אותו ענף כשנכנס Push/PR חדש
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -17,11 +16,9 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      # 1. שיכפול הקוד מהמאגר
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2. התקנת Qt 6
       - name: Install Qt 6
         uses: jurplel/install-qt-action@v3
         with:
@@ -30,18 +27,15 @@ jobs:
           target: 'desktop'
           arch: 'win64_msvc2019_64'
 
-      # 3. הגדרת סביבת C++ / MSVC
       - name: Setup MSVC developer command prompt
         uses: ilammy/msvc-dev-cmd@v1
 
-      # 4. הגדרת קבצי ה-CMake והורדת התלויות (כולל מעקף תאימות CMAKE_POLICY_VERSION_MINIMUM)
+      # שימוש במירכאות מונע מ-PowerShell/Cmd לפצל את "3.5"
       - name: Configure CMake
-        run: cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+        run: cmake -B build -DCMAKE_BUILD_TYPE=Release "-DCMAKE_POLICY_VERSION_MINIMUM=3.5"
 
-      # 5. קימפול הפרויקט
       - name: Build Project
         run: cmake --build build --config Release
 
-      # 6. הרצת בדיקות
       - name: Run Tests
         run: ctest --test-dir build -C Release --output-on-failure
