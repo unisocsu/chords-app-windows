@@ -1,37 +1,28 @@
-# Build directories
+# Build outputs
 /build/
-/build-*/
 /out/
 /cmake-build-*/
 
-# C++ & CMake generated files
+# C++ / CMake binaries
 CMakeCache.txt
 CMakeFiles/
 Makefile
 *.cmake
 !/CMakeLists.txt
-!/cmake/*.cmake
+!/third_party/CMakeLists.txt
+!/engine/CMakeLists.txt
+!/app/CMakeLists.txt
 
-# IDEs & Editors
+# IDE & Editor files
 .vs/
 .vscode/
 .idea/
 *.user
-*.user.*
 *.suo
-*.sln
-*.vcxproj*
 
-# Binaries & Libraries
+# Executables & Static Libraries
 *.exe
 *.dll
 *.so
-*.dylib
 *.a
 *.lib
-*.obj
-*.o
-
-# OS specific
-.DS_Store
-Thumbs.db
