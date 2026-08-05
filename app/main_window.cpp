@@ -1,22 +1,18 @@
-#ifndef CHORDSTUDIO_MAIN_WINDOW_HPP
-#define CHORDSTUDIO_MAIN_WINDOW_HPP
+#include "main_window.hpp"
+#include "audio/audio_engine.hpp"
 
-#include <QMainWindow>
-#include <memory>
+MainWindow::MainWindow(QWidget *parent)
+    : QMainWindow(parent),
+      m_audioEngine(std::make_unique<chordstudio::AudioEngine>()) {
+    
+    setWindowTitle("ChordStudio");
+    resize(1280, 720);
 
-namespace chordstudio {
-    class AudioEngine;
+    m_audioEngine->initialize();
 }
 
-class MainWindow : public QMainWindow {
-    Q_OBJECT
-
-public:
-    explicit MainWindow(QWidget *parent = nullptr);
-    ~MainWindow() override;
-
-private:
-    std::unique_ptr<chordstudio::AudioEngine> m_audioEngine;
-};
-
-#endif // CHORDSTUDIO_MAIN_WINDOW_HPP
+MainWindow::~MainWindow() {
+    if (m_audioEngine) {
+        m_audioEngine->shutdown();
+    }
+}
