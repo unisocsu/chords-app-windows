@@ -1,5 +1,5 @@
 #include "audio_engine.hpp"
-#include "utils/logger.hpp"
+#include "logger.hpp"
 
 namespace chordstudio {
 
