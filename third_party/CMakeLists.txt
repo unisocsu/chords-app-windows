@@ -12,7 +12,7 @@ FetchContent_MakeAvailable(json)
 FetchContent_Declare(
     kissfft
     GIT_REPOSITORY https://github.com/mborgerding/kissfft.git
-    GIT_TAG        v130.1.0
+    GIT_TAG        master
 )
 set(KISSFFT_DATATYPE "float" CACHE STRING "" FORCE)
 FetchContent_MakeAvailable(kissfft)
@@ -25,7 +25,15 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(miniz)
 
-# 4. Miniaudio framework (Single header setup)
+# 4. Whisper.cpp AI engine
+FetchContent_Declare(
+    whisper
+    GIT_REPOSITORY https://github.com/ggerganov/whisper.cpp.git
+    GIT_TAG        v1.5.4
+)
+FetchContent_MakeAvailable(whisper)
+
+# 5. Miniaudio framework (Single header setup)
 FetchContent_Declare(
     miniaudio_repo
     GIT_REPOSITORY https://github.com/mackron/miniaudio.git
