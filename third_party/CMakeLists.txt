@@ -1,5 +1,8 @@
 include(FetchContent)
 
+# הגדרת מדיניות תאימות לגרסאות CMake ישנות בספריות צד-שלישי
+set(CMAKE_POLICY_VERSION_MINIMUM 3.5 CACHE STRING "" FORCE)
+
 # 1. JSON library
 FetchContent_Declare(
     json
@@ -14,7 +17,10 @@ FetchContent_Declare(
     GIT_REPOSITORY https://github.com/mborgerding/kissfft.git
     GIT_TAG        master
 )
+# ביטול בילד של כלים ובדיקות פנימיות שדורשים pkg-config
 set(KISSFFT_DATATYPE "float" CACHE STRING "" FORCE)
+set(KISSFFT_TOOLS OFF CACHE BOOL "" FORCE)
+set(KISSFFT_TEST OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(kissfft)
 
 # 3. Miniz compression library
