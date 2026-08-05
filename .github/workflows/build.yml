@@ -1,0 +1,42 @@
+name: ChordStudio CI Build
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  build-windows:
+    name: Build on Windows (MSVC)
+    runs-on: windows-latest
+
+    steps:
+      # 1. שיכפול הקוד מהמאגר
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. התקנת Qt 6
+      - name: Install Qt 6
+        uses: jurplel/install-qt-action@v3
+        with:
+          version: '6.6.0'
+          host: 'windows'
+          target: 'desktop'
+          arch: 'win64_msvc2019_64'
+
+      # 3. הגדרת סביבת C++ / MSVC
+      - name: Setup MSVC developer command prompt
+        uses: ilammy/msvc-dev-cmd@v1
+
+      # 4. הגדרת קבצי ה-CMake והורדת התלויות (FetchContent)
+      - name: Configure CMake
+        run: cmake -B build -DCMAKE_BUILD_TYPE=Release
+
+      # 5. קימפול הפרויקט
+      - name: Build Project
+        run: cmake --build build --config Release
+
+      # 6. הרצת בדיקות (Tests) במידה ויש
+      - name: Run Tests
+        run: ctest --test-dir build -C Release --output-on-failure
