@@ -6,6 +6,11 @@ on:
   pull_request:
     branches: [ "main", "master" ]
 
+# ביטול ריצות קודמות שעדיין פועלות על אותו ענף כשנכנס Push/PR חדש
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build-windows:
     name: Build on Windows (MSVC)
@@ -29,14 +34,14 @@ jobs:
       - name: Setup MSVC developer command prompt
         uses: ilammy/msvc-dev-cmd@v1
 
-      # 4. הגדרת קבצי ה-CMake והורדת התלויות (FetchContent)
+      # 4. הגדרת קבצי ה-CMake והורדת התלויות (כולל מעקף תאימות CMAKE_POLICY_VERSION_MINIMUM)
       - name: Configure CMake
-        run: cmake -B build -DCMAKE_BUILD_TYPE=Release
+        run: cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_POLICY_VERSION_MINIMUM=3.5
 
       # 5. קימפול הפרויקט
       - name: Build Project
         run: cmake --build build --config Release
 
-      # 6. הרצת בדיקות (Tests) במידה ויש
+      # 6. הרצת בדיקות
       - name: Run Tests
         run: ctest --test-dir build -C Release --output-on-failure
