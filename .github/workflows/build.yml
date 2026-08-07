@@ -19,6 +19,43 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # 1. ⚡ FAST-FAIL: בדיקת שפיות תוך 2 שניות מנעת שריפת דקות ריצה
+      - name: Sanity Check - Verify Source Files Exist
+        shell: powershell
+        run: |
+          $requiredFiles = @(
+            "engine/audio/audio_engine.cpp",
+            "engine/audio/audio_engine.hpp",
+            "engine/chords/chord_analyzer.cpp",
+            "engine/fft/fft_processor.cpp",
+            "engine/lyrics/lyrics_analyzer.cpp",
+            "engine/whisper/whisper_wrapper.cpp",
+            "engine/models/project_model.cpp",
+            "engine/utils/logger.cpp",
+            "engine/utils/logger.hpp"
+          )
+          $missing = @()
+          foreach ($file in $requiredFiles) {
+            if (-not (Test-Path $file)) {
+              $missing += $file
+            }
+          }
+          if ($missing.Count -gt 0) {
+            Write-Host "::error::Missing required source files:`n$($missing -join "`n")"
+            exit 1
+          }
+          Write-Host "✅ All required source files exist! Proceeding with build..."
+
+      # 2. ⚡ CACHE: שמירת הספריות המורדות (whisper, kissfft, miniz) במטמון
+      - name: Cache CMake FetchContent Dependencies
+        uses: actions/cache@v4
+        with:
+          path: build/_deps
+          key: fetchcontent-${{ runner.os }}-${{ hashFiles('**/CMakeLists.txt') }}
+          restore-keys: |
+            fetchcontent-${{ runner.os }}-
+
+      # 3. ⚡ FAST QT: התקנת Qt עם זיכרון מטמון מופעל
       - name: Install Qt 6
         uses: jurplel/install-qt-action@v3
         with:
@@ -26,16 +63,27 @@ jobs:
           host: 'windows'
           target: 'desktop'
           arch: 'win64_msvc2019_64'
+          cache: true
 
       - name: Setup MSVC developer command prompt
         uses: ilammy/msvc-dev-cmd@v1
 
-      # שימוש במירכאות מונע מ-PowerShell/Cmd לפצל את "3.5"
       - name: Configure CMake
         run: cmake -B build -DCMAKE_BUILD_TYPE=Release "-DCMAKE_POLICY_VERSION_MINIMUM=3.5"
 
+      # 4. ⚡ FAST BUILD: קימפול במקביל על כל הליבות של המעבד
       - name: Build Project
-        run: cmake --build build --config Release
+        run: cmake --build build --config Release --parallel
 
       - name: Run Tests
         run: ctest --test-dir build -C Release --output-on-failure
+
+      # 5. 📦 ARTIFACT: העלאת ה-EXE המוכן להורדה ישירות מ-GitHub
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: ChordStudio-Windows-Executable
+          path: |
+            build/app/Release/*.exe
+            build/app/Release/*.dll
